@@ -7,7 +7,7 @@ def add_cube_callback(vis):
     add_cube(vis, pos)
 
 def add_cube(vis, pos):
-    cube = o3d.geometry.TriangleMesh.create_box(width=1.0, height=1.0, depth=1.0)
+    cube = o3d.geometry.TriangleMesh.create_box(width=100.0, height=100.0, depth=100.0)
     cube.compute_vertex_normals()
     cube.translate(pos)  # Adjust position as needed
     vis.add_geometry(cube)
@@ -20,7 +20,7 @@ def format_extrinsics(extrinsics):
         for row in extrinsics
     ])
 
-def update_extrinsics_text(view_control, img_width=600, img_height=400):
+def update_extrinsics_text(view_control):
     global previous_extrinsics
 
     # Get current extrinsics
@@ -30,19 +30,21 @@ def update_extrinsics_text(view_control, img_width=600, img_height=400):
         # Update previous extrinsics window
         prev_text = format_extrinsics(previous_extrinsics)
         prev_img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
-        y0, dy = 40, 40
+        y0, dy = 100, 70
         for i, line in enumerate(prev_text.split('\n')):
             y = y0 + i * dy
-            cv2.putText(prev_img, line, (20, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2, cv2.LINE_AA)
+            cv2.putText(prev_img, line, (10, y), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
         cv2.imshow("Previous Extrinsics", prev_img)
+        
 
         # Update current extrinsics window
         current_text = format_extrinsics(current_extrinsics)
         current_img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
         for i, line in enumerate(current_text.split('\n')):
             y = y0 + i * dy
-            cv2.putText(current_img, line, (20, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(current_img, line, (10, y), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
         cv2.imshow("Current Extrinsics", current_img)
+        
 
         # Update previous extrinsics
         previous_extrinsics = current_extrinsics.copy()
@@ -53,6 +55,11 @@ def update_extrinsics_text(view_control, img_width=600, img_height=400):
 # OpenCV window setup
 cv2.namedWindow("Current Extrinsics", cv2.WINDOW_NORMAL)
 cv2.namedWindow("Previous Extrinsics", cv2.WINDOW_NORMAL)
+img_width=1000 
+img_height=400
+cv2.resizeWindow("Previous Extrinsics", img_width, img_height)
+cv2.resizeWindow("Current Extrinsics", img_width, img_height)
+
 previous_extrinsics = np.eye(4)
 
 
@@ -82,6 +89,8 @@ vis = o3d.visualization.VisualizerWithKeyCallback()
 vis.create_window(width=width, height=height)
 # Register the callback for the "C" key
 vis.register_key_callback(ord("C"), add_cube_callback)
+cv2.moveWindow("Previous Extrinsics", width+100, 0)
+cv2.moveWindow("Current Extrinsics", width+100, int(height/2))
 
 # Apply the camera parameters to the view control
 view_control = vis.get_view_control()
@@ -89,12 +98,12 @@ view_control.convert_from_pinhole_camera_parameters(camera_parameters, allow_arb
 
 
 # Load the OBJ file
-# mesh = o3d.io.read_triangle_mesh(r"C:\Users\massimo.bortolamei\Documents\open3d-visualizer\tex_sample_03_aligned.obj")
-mesh = o3d.io.read_triangle_mesh(r"C:\Users\massimo.bortolamei\Documents\head-tracking\data\mapping\deca_scaled_translated\deca_scaled_translated.obj")
+mesh = o3d.io.read_triangle_mesh(r"C:\Users\massimo.bortolamei\Documents\open3d-visualizer\tex_sample_03_aligned.obj")
+# mesh = o3d.io.read_triangle_mesh(r"C:\Users\massimo.bortolamei\Documents\head-tracking\data\mapping\deca_scaled_translated\deca_scaled_translated.obj")
 mesh.compute_vertex_normals()
 vis.add_geometry(mesh)
 
-axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=10.0, origin=[0, 0, 0])
+axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=500.0, origin=[0, 0, 0])
 vis.add_geometry(axis)
 
 counter = 0
@@ -115,4 +124,14 @@ while True:
 # vis.run()
 # vis.destroy_window()
 
+# Testing code
+# my_extrinsics = np.array([
+#     [0, 1, 0, 0],  # Rotation and translation for x
+#     [0, 0, -1, 0],  # Rotation and translation for y
+#     [-1, 0, 0, 1500],  # Rotation and translation for z
+#     [0, 0, 0, 1]   # Homogeneous coordinate
+# ])
+# new_camera_parameters = camera_parameters
+# new_camera_parameters.extrinsic = my_extrinsics
+# view_control.convert_from_pinhole_camera_parameters(new_camera_parameters, allow_arbitrary=True)
 
