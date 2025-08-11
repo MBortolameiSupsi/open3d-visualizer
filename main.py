@@ -98,12 +98,12 @@ view_control.convert_from_pinhole_camera_parameters(camera_parameters, allow_arb
 
 
 # Load the OBJ file
-mesh = o3d.io.read_triangle_mesh(r"C:\Users\massimo.bortolamei\Documents\open3d-visualizer\tex_sample_03_aligned.obj")
-# mesh = o3d.io.read_triangle_mesh(r"C:\Users\massimo.bortolamei\Documents\head-tracking\data\mapping\deca_scaled_translated\deca_scaled_translated.obj")
+# mesh = o3d.io.read_triangle_mesh(r"C:\Users\massimo.bortolamei\Documents\open3d-visualizer\tex_sample_03_aligned.obj")
+mesh = o3d.io.read_triangle_mesh(r"C:\Users\massimo.bortolamei\Documents\head-tracking\data\mapping\deca_scaled_translated\deca_scaled_translated.obj")
 mesh.compute_vertex_normals()
 vis.add_geometry(mesh)
 
-axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=500.0, origin=[0, 0, 0])
+axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=50.0, origin=[0, 0, 0])
 vis.add_geometry(axis)
 
 counter = 0
@@ -125,13 +125,27 @@ while True:
 # vis.destroy_window()
 
 # Testing code
-# my_extrinsics = np.array([
-#     [0, 1, 0, 0],  # Rotation and translation for x
-#     [0, 0, -1, 0],  # Rotation and translation for y
-#     [-1, 0, 0, 1500],  # Rotation and translation for z
-#     [0, 0, 0, 1]   # Homogeneous coordinate
-# ])
-# new_camera_parameters = camera_parameters
-# new_camera_parameters.extrinsic = my_extrinsics
-# view_control.convert_from_pinhole_camera_parameters(new_camera_parameters, allow_arbitrary=True)
+my_extrinsics = np.array([
+    [0, 1, 0, 0],  # Rotation and translation for x
+    [0, 0, -1, 0],  # Rotation and translation for y
+    [-1, 0, 0, 1500],  # Rotation and translation for z
+    [0, 0, 0, 1]   # Homogeneous coordinate
+])
+new_camera_parameters = camera_parameters
+new_camera_parameters.extrinsic = my_extrinsics
+view_control.convert_from_pinhole_camera_parameters(new_camera_parameters, allow_arbitrary=True)
 
+my_extrinsics = np.array([
+    [1, 0, 0, 0],  # Rotation and translation for x
+    [0, -1, 0, 0],  # Rotation and translation for y
+    [0, 0, -1, 1500],  # Rotation and translation for z
+    [0, 0, 0, 1]   # Homogeneous coordinate
+])
+new_camera_parameters = camera_parameters
+new_camera_parameters.extrinsic = my_extrinsics
+view_control.convert_from_pinhole_camera_parameters(new_camera_parameters, allow_arbitrary=True)
+
+view_control.set_lookat([0, 0, 0])  # Adjust camera look-at point
+view_control.set_up([0, 0, 1])  # Adjust the up direction of the camera
+view_control.set_front([1, 0, 0])  # Adjust the front direction of the camera
+view_control.set_zoom(1)  # Adjust the zoom level of the camera
